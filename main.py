@@ -208,7 +208,7 @@ def view_customer_history(user):
 		if payment["user"] == user["username"]:
 			print(f"Vehicle: {payment['vehicle_id']} | Mall: {MALLS[payment['mall']]['name']} | Amount: R{payment['amount']:.2f} | Date: {payment['timestamp']}")
 
-def admin_view_parked_vehicles(user):
+def admin_view_parked_vehicles(_):
 	parking_data = load_parking()
 	mall_key, mall = select_mall()
 	if not mall:
@@ -222,7 +222,7 @@ def admin_view_parked_vehicles(user):
 	print(f"Total parked vehicles: {count}")
 	print(f"Parking capacity: {mall['capacity']}")
 
-def admin_view_daily_activity(user):
+def admin_view_daily_activity(_):
 	parking_data = load_parking()
 	mall_key, mall = select_mall()
 	if not mall:
@@ -248,13 +248,13 @@ def owner_generate_reports(_):
 	payments = load_payments()
 	print("\n--- Mall Reports ---")
 	for mall_key, mall in MALLS.items():
-		total_vehicles = sum(1 for r in parking_data.values() if r["mall"] == mall_key)
-		total_revenue = sum(p["amount"] for p in payments.values() if p["mall"] == mall_key)
+		total_vehicles = sum(1 for revenue in parking_data.values() if revenue["mall"] == mall_key)
+		total_revenue = sum(parking["amount"] for parking in payments.values() if parking["mall"] == mall_key)
 		durations = []
-		for r in parking_data.values():
-			if r["mall"] == mall_key and r["exit_time"]:
-				entry = datetime.fromisoformat(r["entry_time"])
-				exit_ = datetime.fromisoformat(r["exit_time"])
+		for revenue in parking_data.values():
+			if revenue["mall"] == mall_key and revenue["exit_time"]:
+				entry = datetime.fromisoformat(revenue["entry_time"])
+				exit_ = datetime.fromisoformat(revenue["exit_time"])
 				durations.append((exit_ - entry).total_seconds() / 3600)
 		avg_duration = sum(durations)/len(durations) if durations else 0
 		print(f"\nMall: {mall['name']}")
